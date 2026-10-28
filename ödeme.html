@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ödeme Yap - Artisan Studio</title>
+  
+  <!-- PWA ve Mobil Entegrasyon Etiketleri -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#C45B24">
+
+  <!-- Fontlar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+ 
+  <style>
+    :root {
+      --bg-main: #F4ECE1;
+      --card-bg: #FAF5EE;
+      --primary-dark: #3D2B1F;
+      --accent-orange: #C45B24;
+      --sub-text: #7A6352;
+      --border-color: #E8DCCF;
+      --sidebar-bg: #FAF5EE;
+    }
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+ 
+    body {
+      background-color: #CDBEB1;
+      color: var(--primary-dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    /* TELEFON UYGULAMASI ÇERÇEVESİ */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 390px;
+      background-color: var(--bg-main);
+      border: 10px solid #2C1810;
+      border-radius: 35px;
+      box-shadow: 0 15px 35px rgba(44, 24, 16, 0.25);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      min-height: 820px;
+      padding-bottom: 30px;
+    }
+
+    /* TELEFON ÜST ÇENTİK / DİNAMİK ADA (NOTCH) */
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 20px;
+      background-color: #2C1810;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      z-index: 1005;
+      pointer-events: none;
+    }
+
+    /* UYGULAMA İÇİ EKRAN */
+    .phone-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 45px 12px 20px 12px;
+    }
+
+    /* SEPETE DÖN BUTONU */
+    .back-btn {
+      position: absolute;
+      top: 24px;
+      left: 12px;
+      z-index: 1003;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 9px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+ 
+    .back-btn:hover {
+      background-color: #EFE6DA;
+      color: var(--accent-orange);
+      border-color: var(--accent-orange);
+    }
+
+    /* ÜST LOGO ALANI */
+    .header-logo-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 5px;
+      margin-bottom: 12px;
+    }
+
+    .chef-logo {
+      width: 85px;
+      height: 85px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--card-bg);
+      box-shadow: 0 4px 15px rgba(61,43,31,0.15);
+    }
+ 
+    .payment-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(61,43,31,0.04);
+    }
+ 
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--primary-dark);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+    }
+ 
+    .form-group {
+      margin-bottom: 10px;
+    }
+ 
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+      color: var(--sub-text);
+    }
+ 
+    .form-control {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      background-color: var(--card-bg);
+      color: var(--primary-dark);
+      outline: none;
+    }
+ 
+    .form-control:focus {
+      border-color: var(--accent-orange);
+    }
+ 
+    .form-row {
+      display: flex;
+      gap: 8px;
+    }
+ 
+    .form-row .form-group {
+      flex: 1;
+    }
+ 
+    .total-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 1px dashed var(--border-color);
+      margin-top: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+ 
+    .total-price {
+      color: var(--accent-orange);
+    }
+ 
+    .pay-btn {
+      width: 100%;
+      background-color: var(--accent-orange);
+      color: #FFF;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background-color 0.2s ease;
+      box-shadow: 0 4px 12px rgba(196,91,36,0.25);
+    }
+ 
+    .pay-btn:hover {
+      background-color: #b04e1e;
+    }
+
+    /* TELEFONDAN AÇILDIĞINDA EKRANI TAM KAPLAMASI İÇİN MEDYA SORGUSU */
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+        background-color: var(--bg-main);
+      }
+      .phone-wrapper {
+        width: 100%;
+        min-height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .phone-notch {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELEFON ÇERÇEVESİ -->
+  <div class="phone-wrapper">
+    <div class="phone-notch"></div>
+
+    <div class="phone-screen">
+
+      <!-- SEPETE DÖN BUTONU -->
+      <a href="sepetim.html" class="back-btn">← Sepet</a>
+
+      <!-- ÜST LOGO (SEF.JPG.PNG) -->
+      <div class="header-logo-area">
+        <img src="resimler/sef.jpg.png" alt="Artisan Şefi" class="chef-logo">
+      </div>
+
+      <!-- ANA İÇERİK -->
+      <main class="payment-card">
+        <h2 class="section-title">💳 Ödeme Bilgileri</h2>
+     
+        <form id="paymentForm" onsubmit="handlePayment(event)">
+          <div class="form-group">
+            <label>Kart Üzerindeki İsim</label>
+            <input type="text" class="form-control" placeholder="Ahmet Yılmaz" required>
+          </div>
+     
+          <div class="form-group">
+            <label>Kart Numarası</label>
+            <input type="text" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" required>
+          </div>
+     
+          <div class="form-row">
+            <div class="form-group">
+              <label>Son Kullanma Tarihi</label>
+              <input type="text" id="expiryDate" class="form-control" placeholder="AA/YY" maxlength="5" required>
+            </div>
+            <div class="form-group">
+              <label>CVV / CVC</label>
+              <input type="text" id="cvv" class="form-control" placeholder="123" maxlength="3" required>
+            </div>
+          </div>
+     
+          <div class="total-summary">
+            <span>Ödenecek Tutar:</span>
+            <span class="total-price" id="orderTotal">₺0,00</span>
+          </div>
+     
+          <button type="submit" class="pay-btn">Ödemeyi Tamamla ➔</button>
+        </form>
+      </main>
+
+    </div>
+  </div>
+ 
+  <script>
+    function calculateTotal(){
+      try {
+        const cart1 = JSON.parse(localStorage.getItem('artisanCart') || '[]');
+        const cart2 = JSON.parse(localStorage.getItem('artisan_cart') || '[]');
+        const cart = cart1.length > 0 ? cart1 : cart2;
+
+        let total = 0;
+        cart.forEach(item => {
+          total += (Number(item.price) || 0) * (Number(item.quantity) || 1);
+        });
+        document.getElementById('orderTotal').textContent = `₺${total.toFixed(2).replace('.', ',')}`;
+      } catch (e) {
+        document.getElementById('orderTotal').textContent = '₺0,00';
+      }
+    }
+ 
+    function handlePayment(event){
+      event.preventDefault();
+
+      const cart1 = JSON.parse(localStorage.getItem('artisanCart') || '[]');
+      const cart2 = JSON.parse(localStorage.getItem('artisan_cart') || '[]');
+      const cart = cart1.length > 0 ? cart1 : cart2;
+ 
+      localStorage.setItem('artisan_last_order', JSON.stringify(cart));
+      localStorage.removeItem('artisanCart');
+      localStorage.removeItem('artisan_cart');
+ 
+      window.location.href = 'siparis_onay.html';
+    }
+ 
+    document.addEventListener('DOMContentLoaded', function() {
+      calculateTotal();
+ 
+      const expiryInput = document.getElementById('expiryDate');
+      const cvvInput = document.getElementById('cvv');
+ 
+      if (expiryInput) {
+        expiryInput.addEventListener('input', function(e) {
+          let value = e.target.value.replace(/\D/g, '');
+          if (value.length >= 2) {
+            let month = parseInt(value.substring(0, 2), 10);
+            if (month > 12) value = '12' + value.substring(2);
+            if (month === 0) value = '01' + value.substring(2);
+          }
+          if (value.length > 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4);
+          }
+          e.target.value = value;
+        });
+ 
+        expiryInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Backspace' && e.target.value.length === 3) {
+            e.target.value = e.target.value.substring(0, 2);
+          }
+        });
+      }
+ 
+      if (cvvInput) {
+        cvvInput.addEventListener('input', function(e) {
+          e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

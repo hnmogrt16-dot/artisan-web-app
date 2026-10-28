@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sandviç Çeşitlerimiz - Artisan Workshop</title>
+  
+  <!-- PWA ve Mobil Entegrasyon Etiketleri -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#C45B24">
+
+  <!-- Fontlar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+ 
+  <style>
+    :root {
+      --bg-main:#F9F6F0;
+      --card-bg:#FFFFFF;
+      --sidebar-bg:#FAF5EE;
+      --primary-dark:#2C1810;
+      --accent-orange:#C45B24;
+      --sub-text:#7D6E65;
+      --border-color:#E2D8CD;
+    }
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+ 
+    body {
+      background-color: #CDBEB1;
+      color: var(--primary-dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow: hidden;
+    }
+
+    /* TELEFON UYGULAMASI ÇERÇEVESİ (BİRAZ DAHA GENİŞLETİLDİ) */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 390px;
+      height: 840px;
+      max-height: 96vh;
+      background-color: var(--bg-main);
+      border: 10px solid #2C1810;
+      border-radius: 35px;
+      box-shadow: 0 15px 35px rgba(44, 24, 16, 0.25);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* TELEFON ÜST ÇENTİK / DİNAMİK ADA (NOTCH) */
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 20px;
+      background-color: #2C1810;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      z-index: 1002;
+      pointer-events: none;
+    }
+
+    /* UYGULAMA İÇİ EKRAN (BOLCUKLAR GÜNCELLENDİ) */
+    .phone-screen {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      position: relative;
+      padding: 45px 12px 60px 12px; /* Alt boşluk artırılarak son kartın rahatça görünmesi sağlandı */
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .phone-screen::-webkit-scrollbar {
+      display: none;
+    }
+ 
+    /* HAMBURGER BUTONU */
+    .menu-toggle-btn {
+      position: absolute;
+      top: 24px;
+      left: 12px;
+      z-index: 1001;
+      background-color: var(--card-bg);
+      color: var(--primary-dark);
+      border: 1px solid var(--border-color);
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      transition: all 0.2s ease;
+    }
+ 
+    .menu-toggle-btn:hover {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-color: var(--accent-orange);
+    }
+ 
+    .menu-toggle-btn span {
+      display: block;
+      width: 16px;
+      height: 2px;
+      background-color: currentColor;
+      border-radius: 2px;
+    }
+
+    /* ÜST LOGO (SEF.JPG.PNG) ALANI */
+    .header-logo-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 5px;
+      margin-bottom: 12px;
+    }
+
+    .header-logo-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--card-bg);
+      box-shadow: 0 4px 12px rgba(44, 24, 16, 0.1);
+    }
+ 
+    /* KARARTMA PERDESİ (OVERLAY) */
+    .sidebar-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.45);
+      backdrop-filter: blur(2px);
+      z-index: 9998;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+ 
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+ 
+    /* SOL AÇILIR MENÜ (OFF-CANVAS SIDEBAR) */
+    .sidebar {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 260px;
+      height: 100%;
+      background-color: var(--sidebar-bg);
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      z-index: 9999;
+      overflow-y: auto;
+      transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 6px 0 20px rgba(0,0,0,0.15);
+    }
+ 
+    .sidebar.open {
+      left: 0;
+    }
+ 
+    /* MENÜ KAPATMA BUTONU */
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+      background: rgba(0,0,0,0.1);
+      color: var(--primary-dark);
+      border: 1px solid var(--border-color);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+    }
+ 
+    .close-btn:hover {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-color: var(--accent-orange);
+    }
+ 
+    /* ŞEF GÖRSELİ LOGO ALANI */
+    .sidebar-header-img {
+      padding: 18px 12px 10px 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+ 
+    .chef-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 4px 10px rgba(44,24,16,0.08);
+    }
+ 
+    /* MENÜ BUTONLARI */
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+ 
+    .nav-btn {
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--primary-dark);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+ 
+    .nav-btn:hover {
+      background-color: #EFE6DA;
+      padding-left: 18px;
+    }
+ 
+    .nav-btn.active {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-bottom-color: var(--accent-orange);
+      font-weight: 600;
+    }
+ 
+    /* SAĞ İÇERİK ALANI */
+    .main-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+ 
+    /* ÜST BAŞLIK ALANI VE GERİ DÖN BUTONU */
+    .header-banner-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 4px;
+    }
+ 
+    .back-btn {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+ 
+    .back-btn:hover {
+      background-color: #EFE6DA;
+      color: var(--accent-orange);
+    }
+ 
+    /* SANDVİÇ BÖLÜMÜ (IZGARA/GRID) */
+    .sandwich-grid-container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px;
+    }
+ 
+    .sandwich-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 20px; /* Liste sonuna ekstra güvenlik boşluğu */
+    }
+ 
+    /* SANDVİÇ KARTLARI */
+    .sandwich-card {
+      background-color: var(--sidebar-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+ 
+    .sandwich-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+    }
+ 
+    .card-img-holder {
+      height: 110px;
+      background-color: #E8DFD5;
+      position: relative;
+    }
+ 
+    .card-img-holder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+ 
+    .card-body {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+ 
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+ 
+    .card-desc {
+      font-size: 0.75rem;
+      color: var(--sub-text);
+      line-height: 1.25;
+    }
+ 
+    /* KART İÇİ ALERJEN BUTONU */
+    .card-allergen-btn {
+      background: none;
+      border: none;
+      color: var(--accent-orange);
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      padding: 0;
+      text-decoration: underline;
+      width: fit-content;
+    }
+ 
+    .card-allergen-btn:hover {
+      color: #9c471c;
+    }
+ 
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 6px;
+      border-top: 1px dashed var(--border-color);
+    }
+ 
+    .price-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+ 
+    .price-tag {
+      font-weight: 700;
+      color: var(--accent-orange);
+      font-size: 0.85rem;
+    }
+ 
+    .calorie-tag {
+      font-size: 0.65rem;
+      color: var(--sub-text);
+      font-weight: 500;
+    }
+ 
+    .card-btn-group {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+ 
+    .order-btn {
+      background-color: var(--primary-dark);
+      color: #FFF;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+ 
+    .order-btn:hover {
+      background-color: var(--accent-orange);
+    }
+ 
+    /* FAVORİ BUTONU */
+    .fav-btn {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+ 
+    .fav-btn:hover {
+      border-color: var(--accent-orange);
+      color: var(--accent-orange);
+      background-color: #FDF2E9;
+    }
+ 
+    .fav-btn.favorited {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-color: var(--accent-orange);
+    }
+ 
+    /* BİLDİRİM BALONCUĞU (TOAST) */
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50px);
+      background-color: var(--card-bg);
+      border: 1px solid var(--accent-orange);
+      color: var(--primary-dark);
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(44,24,16,0.15);
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+ 
+    .toast-notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+ 
+    /* TELEFONDAN AÇILDIĞINDA EKRANI TAM KAPLAMASI İÇİN MEDYA SORGUSU */
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+        background-color: var(--bg-main);
+      }
+      .phone-wrapper {
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .phone-notch {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+ 
+  <!-- TELEFON ÇERÇEVESİ -->
+  <div class="phone-wrapper">
+    <div class="phone-notch"></div>
+
+    <div class="phone-screen">
+
+      <!-- SOL ÜST HAMBURGER BUTONU -->
+      <button class="menu-toggle-btn" id="menuToggle" aria-label="Menüyü Aç">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- ÜST LOGO (SEF.JPG.PNG) -->
+      <div class="header-logo-area">
+        <img src="resimler/sef.jpg.png" alt="Artisan Logo" class="header-logo-img">
+      </div>
+     
+      <!-- KARARTMA OVERLAY -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+     
+      <!-- SOL AÇILIR MENÜ (OFF-CANVAS) -->
+      <aside class="sidebar" id="sidebar">
+        <button class="close-btn" id="menuClose" aria-label="Menüyü Kapat">✕</button>
+     
+        <!-- ŞEF GÖRSELİ LOGO ALANI -->
+        <div class="sidebar-header-img">
+          <img src="resimler/sef.jpg.png" alt="Artisan Şefi" class="chef-avatar">
+        </div>
+     
+        <!-- MENÜ LİNKLERİ -->
+        <nav class="nav-list">
+          <a href="index.html" class="nav-btn">🏠 Anasayfa</a>
+          <a href="tost1..html" class="nav-btn">🌟 Hazır Tostlar</a>
+          <a href="tostolustur.html" class="nav-btn">🥪 Kendi Tostunu Hazırla</a>
+          <a href="sandvic.html" class="nav-btn active">🍞 Hazır Sandviçler</a>
+          <a href="sandvicolustur.html" class="nav-btn">🥖 Kendi Sandviçini Hazırla</a>
+          <a href="sepetim.html" class="nav-btn">🛒 Sepetim</a>
+          <a href="favoriler.html" class="nav-btn">⭐ Favoriler</a>
+          <a href="hakkimiz.html" class="nav-btn">ℹ Hakkımızda</a>
+          <a href="iletisim.html" class="nav-btn">📞 İletişim</a>
+        </nav>
+      </aside>
+     
+      <!-- SAĞ İÇERİK ALANI -->
+      <main class="main-content">
+     
+        <!-- GERİ DÖN BUTONU -->
+        <div class="header-banner-wrapper">
+          <a href="index.html" class="back-btn">← Geri Dön</a>
+        </div>
+     
+        <!-- SANDVİÇ LİSTESİ -->
+        <div class="sandwich-grid-container">
+          <div class="sandwich-grid" id="sandwichGrid">
+     
+            <!-- 1. Sandviç -->
+            <div class="sandwich-card">
+              <div class="card-img-holder">
+                <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80" alt="Dana Cotto">
+              </div>
+              <div class="card-body">
+                <div class="card-title">Dana Cotto</div>
+                <div class="card-desc">Pesto sos, Dana Cotto, kuzu kulağı, burrata, kuru domates, glaze.</div>
+                <button class="card-allergen-btn" onclick="openAllergenModal()">⚠️ Alerjen Bilgisi</button>
+                <div class="card-footer">
+                  <div class="price-group">
+                    <span class="price-tag">₺600</span>
+                    <span class="calorie-tag">🔥 580 kcal</span>
+                  </div>
+                  <div class="card-btn-group">
+                    <button class="fav-btn" onclick="toggleFavorite(this)" title="Favorilere Ekle">⭐</button>
+                    <button class="order-btn" onclick="addToCart(this)">Ekle</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+     
+            <!-- 2. Sandviç -->
+            <div class="sandwich-card">
+              <div class="card-img-holder">
+                <img src="https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=500&q=80" alt="Fico Cotto">
+              </div>
+              <div class="card-body">
+                <div class="card-title">Fico Cotto</div>
+                <div class="card-desc">İncir sos, dana cotto, kuzu kulağı, roka, burrata, kornişon turşu.</div>
+                <button class="card-allergen-btn" onclick="openAllergenModal()">⚠️ Alerjen Bilgisi</button>
+                <div class="card-footer">
+                  <div class="price-group">
+                    <span class="price-tag">₺600</span>
+                    <span class="calorie-tag">🔥 610 kcal</span>
+                  </div>
+                  <div class="card-btn-group">
+                    <button class="fav-btn" onclick="toggleFavorite(this)" title="Favorilere Ekle">⭐</button>
+                    <button class="order-btn" onclick="addToCart(this)">Ekle</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+     
+            <!-- 3. Sandviç -->
+            <div class="sandwich-card">
+              <div class="card-img-holder">
+                <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=500&q=80" alt="Panino Avokado">
+              </div>
+              <div class="card-body">
+                <div class="card-title">Panino Avokado</div>
+                <div class="card-desc">Avokado sos, Karabiberli Roastbeef, Kuzu kulağı, suda mozarella, glaze.</div>
+                <button class="card-allergen-btn" onclick="openAllergenModal()">⚠️ Alerjen Bilgisi</button>
+                <div class="card-footer">
+                  <div class="price-group">
+                    <span class="price-tag">₺550</span>
+                    <span class="calorie-tag">🔥 520 kcal</span>
+                  </div>
+                  <div class="card-btn-group">
+                    <button class="fav-btn" onclick="toggleFavorite(this)" title="Favorilere Ekle">⭐</button>
+                    <button class="order-btn" onclick="addToCart(this)">Ekle</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+     
+            <!-- 4. Sandviç -->
+            <div class="sandwich-card">
+              <div class="card-img-holder">
+                <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80" alt="Panino">
+              </div>
+              <div class="card-body">
+                <div class="card-title">Panino</div>
+                <div class="card-desc">Panino sos, Roastbeef, kuzu kulağı, suda mozarella, jalepeno turşu, taze fesleğen</div>
+                <button class="card-allergen-btn" onclick="openAllergenModal()">⚠️ Alerjen Bilgisi</button>
+                <div class="card-footer">
+                  <div class="price-group">
+                    <span class="price-tag">₺500</span>
+                    <span class="calorie-tag">🔥 490 kcal</span>
+                  </div>
+                  <div class="card-btn-group">
+                    <button class="fav-btn" onclick="toggleFavorite(this)" title="Favorilere Ekle">⭐</button>
+                    <button class="order-btn" onclick="addToCart(this)">Ekle</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+     
+            <!-- 5. Sandviç -->
+            <div class="sandwich-card">
+              <div class="card-img-holder"><img src="https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=500&q=80" alt="Hindi Special"></div>
+              <div class="card-body">
+                <div class="card-title">Hindi Special</div>
+                <div class="card-desc">Pesto sos, hindi füme, kuzu kulağı, burrata, kuru domates, glaze.</div>
+                <button class="card-allergen-btn" onclick="openAllergenModal()">⚠️ Alerjen Bilgisi</button>
+                <div class="card-footer">
+                  <div class="price-group">
+                    <span class="price-tag">₺450</span>
+                    <span class="calorie-tag">🔥 440 kcal</span>
+                  </div>
+                  <div class="card-btn-group">
+                    <button class="fav-btn" onclick="toggleFavorite(this)" title="Favorilere Ekle">⭐</button>
+                    <button class="order-btn" onclick="addToCart(this)">Ekle</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+     
+            <!-- 6. Sandviç -->
+            <div class="sandwich-card">
+              <div class="card-img-holder"><img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=500&q=80" alt="Ton Ton"></div>
+              <div class="card-body">
+                <div class="card-title">Ton Ton</div>
+                <div class="card-desc">Tartar sos, ton balığı, marul, roka, kapari turşu, glaze.</div>
+                <button class="card-allergen-btn" onclick="openAllergenModal()">⚠️ Alerjen Bilgisi</button>
+                <div class="card-footer">
+                  <div class="price-group">
+                    <span class="price-tag">₺500</span>
+                    <span class="calorie-tag">🔥 460 kcal</span>
+                  </div>
+                  <div class="card-btn-group">
+                    <button class="fav-btn" onclick="toggleFavorite(this)" title="Favorilere Ekle">⭐</button>
+                    <button class="order-btn" onclick="addToCart(this)">Ekle</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+     
+          </div>
+        </div>
+     
+      </main>
+     
+    </div>
+  </div>
+ 
+  <!-- BİLDİRİM BALONCUĞU (TOAST) -->
+  <div class="toast-notification" id="toastNotification">
+    ⭐ <span id="toastText">Ürün eklendi!</span>
+  </div>
+ 
+  <!-- JAVASCRIPT KODLARI -->
+  <script>
+    const toggleBtn = document.getElementById('menuToggle');
+    const closeBtn = document.getElementById('menuClose');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+ 
+    function openMenu(){
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+    }
+ 
+    function closeMenu(){
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+    }
+ 
+    toggleBtn.addEventListener('click', openMenu);
+    closeBtn.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+ 
+    let toastTimer = null;
+    function showToast(message){
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastText').textContent = message;
+      toast.classList.add('show');
+      
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+ 
+    function getFavorites(){
+      try {
+        return JSON.parse(localStorage.getItem('artisan_favorites') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+ 
+    function saveFavorites(favorites){
+      localStorage.setItem('artisan_favorites', JSON.stringify(favorites));
+    }
+ 
+    function toggleFavorite(button){
+      const card = button.closest('.sandwich-card');
+      const name = card.querySelector('.card-title').textContent.trim();
+      const priceText = card.querySelector('.price-tag').textContent.trim();
+      const img = card.querySelector('.card-img-holder img').src;
+      const desc = card.querySelector('.card-desc').textContent.trim();
+ 
+      let favorites = getFavorites();
+      const existingIndex = favorites.findIndex(item => item.name === name);
+ 
+      if (existingIndex > -1){
+        favorites.splice(existingIndex, 1);
+        button.classList.remove('favorited');
+        showToast(`"${name}" favorilerden çıkarıldı.`);
+      } else {
+        favorites.push({
+          name: name,
+          price: priceText,
+          img: img,
+          items: [desc] 
+        });
+        button.classList.add('favorited');
+        showToast(`"${name}" favorilere eklendi! ⭐`);
+      }
+ 
+      saveFavorites(favorites);
+    }
+ 
+    function checkExistingFavorites(){
+      const favorites = getFavorites();
+      const favButtons = document.querySelectorAll('.fav-btn');
+ 
+      favButtons.forEach(btn => {
+        const cardTitle = btn.closest('.sandwich-card').querySelector('.card-title').textContent.trim();
+        const isFav = favorites.some(item => item.name === cardTitle);
+        if (isFav) {
+          btn.classList.add('favorited');
+        }
+      });
+    }
+    
+    window.addEventListener('DOMContentLoaded', checkExistingFavorites);
+ 
+    function openAllergenModal(){
+      alert("Bu ürün gluten ve süt ürünleri içerebilir.");
+    }
+ 
+    function addToCart(button){
+      const card = button.closest('.sandwich-card');
+      const name = card.querySelector('.card-title').textContent.trim();
+      const priceText = card.querySelector('.price-tag').textContent.replace('₺','').replace(',','.').trim();
+      const price = parseFloat(priceText) || 0;
+      const img = card.querySelector('.card-img-holder img').src;
+ 
+      try {
+        let cart = JSON.parse(localStorage.getItem('artisanCart') || '[]');
+        
+        const existingItem = cart.find(item => item.name === name);
+        if(existingItem){
+          existingItem.quantity = (existingItem.quantity || 1) + 1;
+        } else {
+          cart.push({
+            id: Date.now(),
+            name: name,
+            price: price,
+            img: img,
+            quantity: 1
+          });
+        }
+ 
+        localStorage.setItem('artisanCart', JSON.stringify(cart));
+        showToast(`"${name}" sepete eklendi! 🛒`);
+      } catch (e) {
+        console.error("Sepete eklenirken hata oluştu:", e);
+      }
+    }
+  </script>
+</body>
+</html>

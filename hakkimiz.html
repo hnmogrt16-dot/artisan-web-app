@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hakkımızda - Artisan Studio</title>
+  
+  <!-- PWA ve Mobil Entegrasyon Etiketleri -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#C45B24">
+
+  <!-- Fontlar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+ 
+  <style>
+    :root {
+      --bg-main: #F4ECE1;
+      --card-bg: #FAF5EE;
+      --primary-dark: #3D2B1F;
+      --accent-orange: #C45B24;
+      --sub-text: #7A6352;
+      --border-color: #E8DCCF;
+      --sidebar-bg: #FAF5EE;
+    }
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+ 
+    body {
+      background-color: #CDBEB1;
+      color: var(--primary-dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    /* TELEFON UYGULAMASI ÇERÇEVESİ */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 390px;
+      background-color: var(--bg-main);
+      border: 10px solid #2C1810;
+      border-radius: 35px;
+      box-shadow: 0 15px 35px rgba(44, 24, 16, 0.25);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      min-height: 820px;
+      padding-bottom: 30px;
+    }
+
+    /* TELEFON ÜST ÇENTİK / DİNAMİK ADA (NOTCH) */
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 20px;
+      background-color: #2C1810;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      z-index: 1005;
+      pointer-events: none;
+    }
+
+    /* UYGULAMA İÇİ EKRAN */
+    .phone-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 45px 12px 20px 12px;
+    }
+
+    /* MENÜ AÇMA / HAMBURGER BUTONU */
+    .menu-toggle-btn {
+      position: absolute;
+      top: 24px;
+      left: 12px;
+      z-index: 1004;
+      background-color: var(--primary-dark);
+      color: #FFFFFF;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+    }
+ 
+    .menu-toggle-btn:hover {
+      background-color: var(--accent-orange);
+      transform: scale(1.05);
+    }
+ 
+    .menu-toggle-btn span.bar {
+      display: block;
+      width: 16px;
+      height: 2px;
+      background-color: #FFFFFF;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+ 
+    /* GERİ DÖN BUTONU */
+    .fixed-back-btn {
+      position: absolute;
+      top: 24px;
+      left: 55px;
+      z-index: 1003;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 9px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+ 
+    .fixed-back-btn:hover {
+      background-color: #EFE6DA;
+      color: var(--accent-orange);
+      border-color: var(--accent-orange);
+    }
+
+    /* ÜST LOGO ALANI */
+    .header-logo-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 5px;
+      margin-bottom: 12px;
+    }
+
+    .header-logo-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--card-bg);
+      box-shadow: 0 4px 15px rgba(61,43,31,0.15);
+    }
+ 
+    /* KARARTMA PERDESİ (OVERLAY) */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(44,24,16,0.45);
+      backdrop-filter: blur(2px);
+      z-index: 9998;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+ 
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+ 
+    /* SOL AÇILIR MENÜ (SIDEBAR) */
+    .sidebar {
+      width: 260px;
+      height: 100vh;
+      background-color: var(--sidebar-bg);
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: -100%;
+      z-index: 9999;
+      box-shadow: 6px 0 20px rgba(44,24,16,0.15);
+      transition: left 0.35s cubic-bezier(0.16,1,0.3,1);
+      overflow-y: auto;
+    }
+ 
+    .sidebar.open {
+      left: 0;
+    }
+ 
+    .sidebar-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+ 
+    .sidebar-close-btn:hover {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-color: var(--accent-orange);
+    }
+ 
+    .sidebar-header-img {
+      padding: 18px 12px 10px 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+ 
+    .chef-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 4px 10px rgba(61,43,31,0.08);
+    }
+ 
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+ 
+    .nav-btn {
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--primary-dark);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+ 
+    .nav-btn:hover {
+      background-color: #EFE6DA;
+      color: var(--accent-orange);
+      padding-left: 18px;
+    }
+ 
+    .nav-btn.active {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-bottom-color: var(--accent-orange);
+      font-weight: 600;
+    }
+
+    /* SAYFA ÖZELİNDEKİ STİLLER */
+    .header-banner {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(61,43,31,0.04);
+    }
+ 
+    .header-banner h1 {
+      font-size: 1rem;
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+ 
+    .content-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      line-height: 1.5;
+      color: var(--primary-dark);
+      box-shadow: 0 2px 8px rgba(61,43,31,0.04);
+    }
+ 
+    .content-card h2 {
+      color: var(--accent-orange);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+ 
+    .content-card p {
+      font-size: 0.75rem;
+      margin-bottom: 10px;
+      color: var(--sub-text);
+    }
+
+    /* TELEFONDAN AÇILDIĞINDA EKRANI TAM KAPLAMASI İÇİN MEDYA SORGUSU */
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+        background-color: var(--bg-main);
+      }
+      .phone-wrapper {
+        width: 100%;
+        min-height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .phone-notch {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELEFON ÇERÇEVESİ -->
+  <div class="phone-wrapper">
+    <div class="phone-notch"></div>
+
+    <div class="phone-screen">
+
+      <!-- SOL ÜST ÜÇ ÇİZGİ MENÜ BUTONU -->
+      <button class="menu-toggle-btn" id="menuBtn" aria-label="Menüyü Aç">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+
+      <!-- GERİ DÖN BUTONU -->
+      <a href="index.html" class="fixed-back-btn">← Geri</a>
+
+      <!-- ÜST LOGO (SEF.JPG.PNG) -->
+      <div class="header-logo-area">
+        <img src="resimler/sef.jpg.png" alt="Artisan Logo" class="header-logo-img">
+      </div>
+
+      <!-- SOL AÇILIR MENÜ (SIDEBAR) -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+      <aside class="sidebar" id="sidebarDrawer">
+        <button class="sidebar-close-btn" id="sidebarCloseBtn">✕</button>
+
+        <!-- ŞEF GÖRSELİ LOGO ALANI -->
+        <div class="sidebar-header-img">
+          <img src="resimler/sef.jpg.png" alt="Artisan Şefi" class="chef-avatar">
+        </div>
+
+        <nav class="nav-list">
+          <a href="index.html" class="nav-btn">🏠 Anasayfa</a>
+          <a href="tost1..html" class="nav-btn">🌟 Hazır Tostlar</a>
+          <a href="tostolustur.html" class="nav-btn">🥪 Kendi Tostunu Hazırla</a>
+          <a href="sandvic.html" class="nav-btn">🍞 Hazır Sandviç</a>
+          <a href="sandvicolustur.html" class="nav-btn">🥖 Kendi Sandviçini Hazırla</a>
+          <a href="sepetim.html" class="nav-btn">🛒 Sepetim</a>
+          <a href="favoriler.html" class="nav-btn">⭐ Favoriler</a>
+          <a href="hakkimiz.html" class="nav-btn active">ℹ️ Hakkımızda</a>
+          <a href="iletisim.html" class="nav-btn">📞 İletişim</a>
+        </nav>
+      </aside>
+
+      <!-- ANA İÇERİK -->
+      <main class="editor-main">
+        <div class="header-banner">
+          <h1>Hikayemiz</h1>
+        </div>
+     
+        <div class="content-card">
+          <h2>Artisan Studio Hakkında</h2>
+          <p>Geleneksel lezzetleri modern gurme dokunuşlarla buluşturan mutfağımızda, en taze malzemeleri özel ekmeklerimizle harmanlıyoruz.</p>
+          <p>Her bir tost ve sandviç reçetemiz, özel ustalık süreçlerinden geçerek masanıza ulaşır. Amacımız sadece karın doyurmak değil, her ısırıkta unutulmaz bir lezzet deneyimi yaşatmaktır.</p>
+        </div>
+      </main>
+
+    </div>
+  </div>
+ 
+  <script>
+    const sidebarDrawer = document.getElementById('sidebarDrawer');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+ 
+    function toggleSidebar(){
+      sidebarDrawer.classList.toggle('open');
+      sidebarOverlay.classList.toggle('active');
+    }
+ 
+    function closeSidebar(){
+      sidebarDrawer.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    }
+ 
+    if (menuBtn) menuBtn.addEventListener('click', toggleSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeSidebar);
+  </script>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sepetim - Artisan Studio</title>
+  
+  <!-- PWA ve Mobil Entegrasyon Etiketleri -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#C45B24">
+
+  <!-- Fontlar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+ 
+  <style>
+    :root {
+      --bg-main: #F4ECE1;
+      --card-bg: #FAF5EE;
+      --primary-dark: #3D2B1F;
+      --accent-orange: #C45B24;
+      --sub-text: #7A6352;
+      --border-color: #E8DCCF;
+      --sidebar-bg: #FAF5EE;
+    }
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+ 
+    body {
+      background-color: #CDBEB1;
+      color: var(--primary-dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    /* TELEFON UYGULAMASI ÇERÇEVESİ */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 390px;
+      background-color: var(--bg-main);
+      border: 10px solid #2C1810;
+      border-radius: 35px;
+      box-shadow: 0 15px 35px rgba(44, 24, 16, 0.25);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      min-height: 820px;
+      padding-bottom: 30px;
+    }
+
+    /* TELEFON ÜST ÇENTİK / DİNAMİK ADA (NOTCH) */
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 20px;
+      background-color: #2C1810;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      z-index: 1005;
+      pointer-events: none;
+    }
+
+    /* UYGULAMA İÇİ EKRAN */
+    .phone-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 45px 12px 20px 12px;
+    }
+
+    /* MENÜ AÇMA / HAMBURGER BUTONU */
+    .menu-toggle-btn {
+      position: absolute;
+      top: 24px;
+      left: 12px;
+      z-index: 1004;
+      background-color: var(--primary-dark);
+      color: #FFFFFF;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+    }
+ 
+    .menu-toggle-btn:hover {
+      background-color: var(--accent-orange);
+      transform: scale(1.05);
+    }
+ 
+    .menu-toggle-btn span.bar {
+      display: block;
+      width: 16px;
+      height: 2px;
+      background-color: #FFFFFF;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+ 
+    /* GERİ DÖN BUTONU */
+    .fixed-back-btn {
+      position: absolute;
+      top: 24px;
+      left: 55px;
+      z-index: 1003;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 9px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+ 
+    .fixed-back-btn:hover {
+      background-color: #EFE6DA;
+      color: var(--accent-orange);
+      border-color: var(--accent-orange);
+    }
+
+    /* ÜST LOGO ALANI */
+    .header-logo-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 5px;
+      margin-bottom: 12px;
+    }
+
+    .header-logo-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--card-bg);
+      box-shadow: 0 4px 15px rgba(61,43,31,0.15);
+    }
+ 
+    /* KARARTMA PERDESİ (OVERLAY) */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(44,24,16,0.45);
+      backdrop-filter: blur(2px);
+      z-index: 9998;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+ 
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+ 
+    /* SOL AÇILIR MENÜ (SIDEBAR) */
+    .sidebar {
+      width: 260px;
+      height: 100vh;
+      background-color: var(--sidebar-bg);
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: -100%;
+      z-index: 9999;
+      box-shadow: 6px 0 20px rgba(44,24,16,0.15);
+      transition: left 0.35s cubic-bezier(0.16,1,0.3,1);
+      overflow-y: auto;
+    }
+ 
+    .sidebar.open {
+      left: 0;
+    }
+ 
+    .sidebar-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+ 
+    .sidebar-close-btn:hover {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-color: var(--accent-orange);
+    }
+ 
+    .sidebar-header-img {
+      padding: 18px 12px 10px 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+ 
+    .chef-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 4px 10px rgba(61,43,31,0.08);
+    }
+ 
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+ 
+    .nav-btn {
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--primary-dark);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+ 
+    .nav-btn:hover {
+      background-color: #EFE6DA;
+      color: var(--accent-orange);
+      padding-left: 18px;
+    }
+ 
+    .nav-btn.active {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-bottom-color: var(--accent-orange);
+      font-weight: 600;
+    }
+
+    /* SEPET İÇERİK STİLLERİ */
+    .cart-title-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding: 0 4px;
+    }
+
+    .cart-title-text {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .clear-cart-btn {
+      background: none; 
+      border: none; 
+      color: var(--sub-text);
+      cursor: pointer; 
+      font-size: 0.75rem; 
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    .clear-cart-btn:hover {
+      color: #d9534f;
+    }
+
+    .cart-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .cart-item {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(61,43,31,0.04);
+    }
+
+    .cart-item-details h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 2px;
+    }
+
+    .cart-item-details p {
+      font-size: 0.7rem;
+      color: var(--sub-text);
+      line-height: 1.25;
+    }
+
+    .cart-item-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .qty-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .qty-btn:hover {
+      background: var(--accent-orange);
+      color: #FFF;
+      border-color: var(--accent-orange);
+    }
+
+    .quantity-controls span {
+      font-size: 0.8rem;
+      font-weight: 600;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    .cart-item-price {
+      font-weight: 700;
+      color: var(--accent-orange);
+      font-size: 0.82rem;
+      min-width: 55px;
+      text-align: right;
+    }
+
+    .summary-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 2px 8px rgba(61,43,31,0.04);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+
+    .summary-total {
+      border-top: 1px dashed var(--border-color);
+      padding-top: 8px;
+      margin-top: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--accent-orange);
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background: var(--accent-orange);
+      color: #FFF;
+      border: none;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background-color 0.2s ease;
+      box-shadow: 0 4px 12px rgba(196,91,36,0.25);
+    }
+
+    .checkout-btn:hover {
+      background-color: #b04e1e;
+    }
+
+    .empty-cart-msg {
+      text-align: center;
+      padding: 40px 15px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      border: 1px dashed var(--border-color);
+      color: var(--sub-text);
+    }
+
+    /* ONAY MODAL KUTUSU */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 24, 16, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+      padding: 15px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 22px 18px;
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(61,43,31,0.2);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+
+    .modal-btn-cancel {
+      background: var(--card-bg);
+      color: var(--primary-dark);
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-btn-confirm {
+      background: #d9534f;
+      color: #FFFFFF;
+    }
+
+    /* TELEFONDAN AÇILDIĞINDA EKRANI TAM KAPLAMASI İÇİN MEDYA SORGUSU */
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+        background-color: var(--bg-main);
+      }
+      .phone-wrapper {
+        width: 100%;
+        min-height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .phone-notch {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELEFON ÇERÇEVESİ -->
+  <div class="phone-wrapper">
+    <div class="phone-notch"></div>
+
+    <div class="phone-screen">
+
+      <!-- SOL ÜST ÜÇ ÇİZGİ MENÜ BUTONU -->
+      <button class="menu-toggle-btn" id="menuBtn" aria-label="Menüyü Aç">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+
+      <!-- GERİ DÖN BUTONU -->
+      <a href="index.html" class="fixed-back-btn">← Geri</a>
+
+      <!-- ÜST LOGO (SEF.JPG.PNG) -->
+      <div class="header-logo-area">
+        <img src="resimler/sef.jpg.png" alt="Artisan Logo" class="header-logo-img">
+      </div>
+
+      <!-- SOL AÇILIR MENÜ (SIDEBAR) -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+      <aside class="sidebar" id="sidebarDrawer">
+        <button class="sidebar-close-btn" id="sidebarCloseBtn">✕</button>
+
+        <!-- ŞEF GÖRSELİ LOGO ALANI -->
+        <div class="sidebar-header-img">
+          <img src="resimler/sef.jpg.png" alt="Artisan Şefi" class="chef-avatar">
+        </div>
+
+        <nav class="nav-list">
+          <a href="index.html" class="nav-btn">🏠 Anasayfa</a>
+          <a href="tost1..html" class="nav-btn">🌟 Hazır Tostlar</a>
+          <a href="tostolustur.html" class="nav-btn">🥪 Kendi Tostunu Hazırla</a>
+          <a href="sandvic.html" class="nav-btn">🍞 Hazır Sandviç</a>
+          <a href="sandvicolustur.html" class="nav-btn">🥖 Kendi Sandviçini Hazırla</a>
+          <a href="sepetim.html" class="nav-btn active">🛒 Sepetim</a>
+          <a href="favoriler.html" class="nav-btn">⭐ Favoriler</a>
+          <a href="hakkimiz.html" class="nav-btn">ℹ️ Hakkımızda</a>
+          <a href="iletisim.html" class="nav-btn">📞 İletişim</a>
+        </nav>
+      </aside>
+
+      <!-- ANA İÇERİK -->
+      <main class="editor-main">
+        <div class="cart-title-bar">
+          <div class="cart-title-text">
+            <span>🛒</span> Sepetiniz
+          </div>
+          <button class="clear-cart-btn" onclick="openConfirmModal()">Sepeti Temizle</button>
+        </div>
+
+        <div id="cartList" class="cart-list"></div>
+
+        <div id="summaryCard" class="summary-card" style="display:none;">
+          <div class="summary-row summary-total">
+            <span>Genel Toplam:</span>
+            <span id="totalPrice">₺0,00</span>
+          </div>
+          <button class="checkout-btn" onclick="goToPayment()">Siparişi Onayla</button>
+        </div>
+      </main>
+
+    </div>
+
+    <!-- ONAY MODAL KUTUSU -->
+    <div class="modal-overlay" id="confirmModal">
+      <div class="modal-box">
+        <div style="font-size: 2rem; margin-bottom: 6px;">⚠️</div>
+        <div style="font-size: 1rem; font-weight: 700; margin-bottom: 6px;">Emin misiniz?</div>
+        <div style="font-size: 0.78rem; color: var(--sub-text);">Sepetinizdeki tüm ürünler silinecektir.</div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" onclick="closeConfirmModal()">Vazgeç</button>
+          <button class="modal-btn modal-btn-confirm" onclick="confirmClearAllCart()">Evet, Temizle</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const sidebarDrawer = document.getElementById('sidebarDrawer');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+
+    function toggleSidebar(){
+      sidebarDrawer.classList.toggle('open');
+      sidebarOverlay.classList.toggle('active');
+    }
+
+    function closeSidebar(){
+      sidebarDrawer.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    }
+
+    if (menuBtn) menuBtn.addEventListener('click', toggleSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeSidebar);
+
+    /* ORTAK SEPET VERİSİNİ OKUMA VE YAZMA (artisanCart ve artisan_cart senkronize) */
+    function getCart(){
+      try {
+        const cart1 = JSON.parse(localStorage.getItem('artisanCart') || '[]');
+        const cart2 = JSON.parse(localStorage.getItem('artisan_cart') || '[]');
+        return cart1.length > 0 ? cart1 : cart2;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCart(cart){
+      localStorage.setItem('artisanCart', JSON.stringify(cart));
+      localStorage.setItem('artisan_cart', JSON.stringify(cart));
+    }
+
+    function updateQuantity(index, change) {
+      let cart = getCart();
+      if (cart[index]) {
+        cart[index].quantity = (cart[index].quantity || 1) + change;
+        if (cart[index].quantity <= 0) {
+          cart.splice(index, 1);
+        }
+        saveCart(cart);
+        renderCart();
+      }
+    }
+
+    function openConfirmModal(){
+      const cart = getCart();
+      if (!cart || cart.length === 0) return;
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function closeConfirmModal(){
+      document.getElementById('confirmModal').classList.remove('active');
+    }
+
+    function confirmClearAllCart(){
+      localStorage.removeItem('artisanCart');
+      localStorage.removeItem('artisan_cart');
+      closeConfirmModal();
+      renderCart();
+    }
+
+    function goToPayment(){
+      const cart = getCart();
+      if (!cart || cart.length === 0) return;
+      window.location.href = 'odeme.html';
+    }
+
+    function renderCart(){
+      const cart = getCart();
+      const cartList = document.getElementById('cartList');
+      const summaryCard = document.getElementById('summaryCard');
+
+      if (!cart || cart.length === 0) {
+        cartList.innerHTML = `
+          <div class="empty-cart-msg">
+            <p style="font-size:0.95rem; font-weight:600; margin-bottom:4px;">Sepetiniz Boş</p>
+            <p style="font-size:0.75rem;">Menüden lezzetli ürünler seçip sepetinize ekleyebilirsiniz.</p>
+          </div>
+        `;
+        summaryCard.style.display = 'none';
+        return;
+      }
+
+      summaryCard.style.display = 'block';
+      let totalPrice = 0;
+
+      cartList.innerHTML = cart.map((item, index) => {
+        const itemPrice = Number(item.price) || 0;
+        const itemQty = Number(item.quantity) || 1;
+        const itemTotal = itemPrice * itemQty;
+        totalPrice += itemTotal;
+
+        const detailText = item.desc || (Array.isArray(item.items) && item.items.length > 0 ? item.items.join(', ') : `Birim Fiyat: ₺${itemPrice.toFixed(2).replace('.', ',')}`);
+
+        return `
+          <div class="cart-item">
+            <div class="cart-item-details">
+              <h4>${item.name || item.title || 'Özel Ürün'}</h4>
+              <p>${detailText}</p>
+            </div>
+            <div class="cart-item-right">
+              <div class="quantity-controls">
+                <button class="qty-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                <span>${itemQty}</span>
+                <button class="qty-btn" onclick="updateQuantity(${index}, 1)">+</button>
+              </div>
+              <span class="cart-item-price">₺${itemTotal.toFixed(2).replace('.', ',')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('totalPrice').textContent = `₺${totalPrice.toFixed(2).replace('.', ',')}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', renderCart);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kendi Sandviçini Tasarla - Artisan Studio</title>
+  
+  <!-- PWA ve Mobil Entegrasyon Etiketleri -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#C45B24">
+
+  <!-- Fontlar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+ 
+  <style>
+    :root {
+      --bg-main: #F4ECE1;
+      --card-bg: #FAF5EE;
+      --primary-dark: #3D2B1F;
+      --accent-orange: #C45B24;
+      --sub-text: #7A6352;
+      --border-color: #E8DCCF;
+      --sidebar-bg: #FAF5EE;
+    }
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+ 
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #CDBEB1;
+      color: var(--primary-dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    /* TELEFON UYGULAMASI ÇERÇEVESİ */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 390px;
+      background-color: var(--bg-main);
+      border: 10px solid #2C1810;
+      border-radius: 35px;
+      box-shadow: 0 15px 35px rgba(44, 24, 16, 0.25);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      /* Dikey taşma sorununu bitiren mobil esnek yapı */
+      min-height: 820px;
+      padding-bottom: 90px; 
+    }
+
+    /* TELEFON ÜST ÇENTİK / DİNAMİK ADA (NOTCH) */
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 20px;
+      background-color: #2C1810;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      z-index: 1005;
+      pointer-events: none;
+    }
+
+    /* UYGULAMA İÇİ EKRAN */
+    .phone-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 45px 12px 20px 12px;
+    }
+ 
+    /* MENÜ AÇMA / HAMBURGER BUTONU */
+    .menu-toggle-btn {
+      position: absolute;
+      top: 24px;
+      left: 12px;
+      z-index: 1004;
+      background-color: var(--primary-dark);
+      color: #FFFFFF;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+    }
+ 
+    .menu-toggle-btn:hover {
+      background-color: var(--accent-orange);
+      transform: scale(1.05);
+    }
+ 
+    .menu-toggle-btn span.bar {
+      display: block;
+      width: 16px;
+      height: 2px;
+      background-color: #FFFFFF;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+ 
+    /* GERİ DÖN BUTONU */
+    .fixed-back-btn {
+      position: absolute;
+      top: 24px;
+      left: 55px;
+      z-index: 1003;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 9px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+ 
+    .fixed-back-btn:hover {
+      background-color: #EFE6DA;
+      color: var(--accent-orange);
+      border-color: var(--accent-orange);
+    }
+
+    /* ÜST LOGO (SEF.JPG.PNG) ALANI */
+    .header-logo-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 5px;
+      margin-bottom: 8px;
+    }
+
+    .header-logo-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--card-bg);
+      box-shadow: 0 4px 12px rgba(61,43,31,0.1);
+    }
+ 
+    /* KARARTMA PERDESİ (OVERLAY) */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(44,24,16,0.45);
+      backdrop-filter: blur(2px);
+      z-index: 9998;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+ 
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+ 
+    /* SOL AÇILIR MENÜ (SIDEBAR) */
+    .sidebar {
+      width: 260px;
+      height: 100vh;
+      background-color: var(--sidebar-bg);
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: -100%;
+      z-index: 9999;
+      box-shadow: 6px 0 20px rgba(44,24,16,0.15);
+      transition: left 0.35s cubic-bezier(0.16,1,0.3,1);
+      overflow-y: auto;
+    }
+ 
+    .sidebar.open {
+      left: 0;
+    }
+ 
+    .sidebar-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid var(--border-color);
+      color: var(--primary-dark);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+ 
+    .sidebar-close-btn:hover {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-color: var(--accent-orange);
+    }
+ 
+    .sidebar-header-img {
+      padding: 18px 12px 10px 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+ 
+    .chef-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 4px 10px rgba(61,43,31,0.08);
+    }
+ 
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+ 
+    .nav-btn {
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--primary-dark);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+ 
+    .nav-btn:hover {
+      background-color: #EFE6DA;
+      color: var(--accent-orange);
+      padding-left: 18px;
+    }
+ 
+    .nav-btn.active {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border-bottom-color: var(--accent-orange);
+      font-weight: 600;
+    }
+ 
+    /* BRAND HEADER */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 15px;
+      margin-top: 5px;
+    }
+ 
+    .brand-header h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.8rem;
+      line-height: 1;
+    }
+ 
+    /* FAVORİLER BÖLÜMÜ STİLLERİ */
+    .favorites-section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+ 
+    .favorites-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+ 
+    .favorites-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+ 
+    .favorites-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+ 
+    .fav-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+ 
+    .fav-card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 2px;
+      padding-right: 18px;
+    }
+ 
+    .fav-card-desc {
+      font-size: 0.7rem;
+      color: var(--sub-text);
+      margin-bottom: 8px;
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+ 
+    .fav-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+      padding-top: 6px;
+      border-top: 1px dashed var(--border-color);
+      gap: 4px;
+    }
+ 
+    .fav-card-price {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent-orange);
+    }
+ 
+    .fav-btn-group {
+      display: flex;
+      gap: 4px;
+    }
+ 
+    .fav-add-btn {
+      background: var(--accent-orange);
+      color: #FFF;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 15px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+ 
+    .fav-load-btn {
+      background: var(--card-bg);
+      color: var(--primary-dark);
+      border: 1px solid var(--border-color);
+      padding: 4px 6px;
+      border-radius: 15px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+ 
+    .fav-delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+ 
+    .empty-fav-msg {
+      font-size: 0.75rem;
+      color: var(--sub-text);
+      font-style: italic;
+    }
+ 
+    /* İSİM VE BUTON ALANI */
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+ 
+    .input-group {
+      position: relative;
+    }
+ 
+    .name-input {
+      width: 100%;
+      padding: 10px 35px 10px 32px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background-color: #FFFFFF;
+      font-size: 0.85rem;
+      color: var(--primary-dark);
+      outline: none;
+      font-weight: 500;
+    }
+ 
+    .name-input:focus {
+      border-color: var(--accent-orange);
+    }
+ 
+    .input-icon-left {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.6;
+      font-size: 0.85rem;
+    }
+ 
+    .input-icon-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      opacity: 0.4;
+      font-size: 0.8rem;
+    }
+ 
+    .badge-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 12px 0 20px 0;
+      flex-wrap: wrap;
+    }
+ 
+    .custom-name-badge {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.4rem;
+      padding: 4px 20px;
+      border-radius: 50px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(196,91,36,0.25);
+    }
+ 
+    .save-fav-btn {
+      background-color: #FFFFFF;
+      color: var(--primary-dark);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+ 
+    .save-fav-btn:hover {
+      background-color: #FDF2E9;
+      border-color: var(--accent-orange);
+      color: var(--accent-orange);
+    }
+ 
+    /* KATEGORİ VE SATIRLAR */
+    .category-group {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 14px;
+    }
+ 
+    .category-header {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+ 
+    .ingredient-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      user-select: none;
+      margin-bottom: 5px;
+      background: #FFFFFF;
+    }
+ 
+    .ingredient-row:hover {
+      border-color: var(--border-color);
+    }
+ 
+    .ingredient-row.selected {
+      background-color: #FDF2E9;
+      border-color: var(--accent-orange);
+    }
+ 
+    .item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+ 
+    .item-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+ 
+    .item-details {
+      display: flex;
+      flex-direction: column;
+    }
+ 
+    .item-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+ 
+    .item-meta {
+      font-size: 0.68rem;
+      color: var(--sub-text);
+    }
+ 
+    .item-status-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--sub-text);
+      background-color: #FFF;
+    }
+ 
+    .ingredient-row.selected .item-status-icon {
+      background-color: var(--accent-orange);
+      color: #FFF;
+      border-color: var(--accent-orange);
+    }
+ 
+    /* YÜZEN SEPETE EKLE BUTONU (Telefon ekranının altında her zaman sabit ve görünür) */
+    .add-to-cart-bar {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 1002;
+    }
+ 
+    .add-to-cart-btn {
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(196,91,36,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+ 
+    .add-to-cart-btn:hover {
+      background-color: #b04e1e;
+    }
+ 
+    .cart-info {
+      font-weight: 500;
+      opacity: 0.95;
+      font-size: 0.8rem;
+    }
+ 
+    /* BİLDİRİM KARTI STİLLERİ */
+    .toast-notification {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 10000;
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 10px 25px rgba(61,43,31,0.18);
+      transform: translateY(150%);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+ 
+    .toast-notification.show {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+ 
+    .toast-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+ 
+    .toast-icon {
+      width: 28px;
+      height: 28px;
+      background-color: #E8F5E9;
+      color: #2E7D32;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+ 
+    .toast-title-group {
+      display: flex;
+      flex-direction: column;
+    }
+ 
+    .toast-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+ 
+    .toast-subtitle {
+      font-size: 0.7rem;
+      color: var(--sub-text);
+    }
+ 
+    .toast-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+ 
+    .toast-btn-secondary, .toast-btn-primary {
+      flex: 1;
+      padding: 6px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .toast-btn-secondary {
+      border: 1px solid var(--border-color);
+      background-color: var(--card-bg);
+      color: var(--primary-dark);
+    }
+
+    .toast-btn-primary {
+      border: none;
+      background-color: var(--accent-orange);
+      color: #FFFFFF;
+    }
+ 
+    /* TELEFONDAN AÇILDIĞINDA EKRANI TAM KAPLAMASI İÇİN MEDYA SORGUSU */
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+        background-color: var(--bg-main);
+      }
+      .phone-wrapper {
+        width: 100%;
+        min-height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .phone-notch {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELEFON ÇERÇEVESİ -->
+  <div class="phone-wrapper">
+    <div class="phone-notch"></div>
+
+    <div class="phone-screen">
+ 
+      <!-- SOL ÜST ÜÇ ÇİZGİ MENÜ BUTONU -->
+      <button class="menu-toggle-btn" id="menuBtn" aria-label="Menüyü Aç">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+     
+      <!-- GERİ DÖN BUTONU -->
+      <a href="index.html" class="fixed-back-btn">← Geri</a>
+
+      <!-- ÜST LOGO (SEF.JPG.PNG) -->
+      <div class="header-logo-area">
+        <img src="resimler/sef.jpg.png" alt="Artisan Logo" class="header-logo-img">
+      </div>
+     
+      <!-- SOL AÇILIR MENÜ (SIDEBAR) -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+      <aside class="sidebar" id="sidebarDrawer">
+        <button class="sidebar-close-btn" id="sidebarCloseBtn">✕</button>
+     
+        <!-- ŞEF GÖRSELİ LOGO ALANI -->
+        <div class="sidebar-header-img">
+          <img src="resimler/sef.jpg.png" alt="Artisan Şefi" class="chef-avatar">
+        </div>
+     
+        <nav class="nav-list">
+          <a href="index.html" class="nav-btn">🏠 Anasayfa</a>
+          <a href="tost1..html" class="nav-btn">🌟 Hazır Tostlar</a>
+          <a href="tostolustur.html" class="nav-btn">🥪 Kendi Tostunu Hazırla</a>
+          <a href="sandvic.html" class="nav-btn">🍞 Hazır Sandviç</a>
+          <a href="sandvicolustur.html" class="nav-btn active">🥖 Kendi Sandviçini Hazırla</a>
+          <a href="sepetim.html" class="nav-btn">🛒 Sepetim</a>
+          <a href="favoriler.html" class="nav-btn">⭐ Favoriler</a>
+          <a href="hakkimiz.html" class="nav-btn">ℹ️ Hakkımızda</a>
+          <a href="iletisim.html" class="nav-btn">📞 İletişim</a>
+        </nav>
+      </aside>
+     
+      <!-- BRAND HEADER -->
+      <header class="brand-header">
+        <h1>Artisan Studio</h1>
+      </header>
+     
+      <main class="editor-main">
+     
+        <!-- FAVORİLERİM BÖLÜMÜ -->
+        <section class="favorites-section" id="favorites-section">
+          <div class="favorites-header">
+            <div class="favorites-title">
+              <span>⭐</span> Favori Sandviç Tariflerim
+            </div>
+          </div>
+          <div class="favorites-grid" id="favoritesGrid">
+            <span class="empty-fav-msg">Henüz kaydedilmiş favori yok.</span>
+          </div>
+        </section>
+     
+        <!-- SANDVİÇ İSMİ -->
+        <div>
+          <label class="section-title">✏️ Sandviçine Bir İsim Ver</label>
+          <div class="input-group">
+            <span class="input-icon-left">🖊️</span>
+            <input type="text" id="recipeName" class="name-input" value="Özel Sandviçim">
+            <span class="input-icon-clear" onclick="clearInput()">✕</span>
+          </div>
+        </div>
+     
+        <div class="badge-actions">
+          <div class="custom-name-badge" id="badgeTitle">Özel Sandviçim</div>
+          <button class="save-fav-btn" onclick="saveToFavorites()">
+            <span>⭐</span> Favorilere Ekle
+          </button>
+        </div>
+     
+        <!-- MALZEME LİSTESİ -->
+        <div>
+          <div class="section-title" style="margin-bottom: 10px;">🥖 Sandviç Malzemelerini Seç</div>
+     
+          <!-- 1. EKMEKLER (Tekli Seçim) -->
+          <div class="category-group">
+            <div class="category-header">🥖 Ekmek Çeşidi</div>
+            
+            <div class="ingredient-row selected" data-price="25" data-kcal="260" onclick="selectRadio(this)">
+              <div class="item-left">
+                <div class="item-icon">🥖</div>
+                <div class="item-details">
+                  <span class="item-name">Baget Ekmek</span>
+                  <span class="item-meta">+₺25 - 260 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">✓</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="30" data-kcal="280" onclick="selectRadio(this)">
+              <div class="item-left">
+                <div class="item-icon">🫓</div>
+                <div class="item-details">
+                  <span class="item-name">Ciabatta Ekmek</span>
+                  <span class="item-meta">+₺30 - 280 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="28" data-kcal="340" onclick="selectRadio(this)">
+              <div class="item-left">
+                <div class="item-icon">🥐</div>
+                <div class="item-details">
+                  <span class="item-name">Kruvazan</span>
+                  <span class="item-meta">+₺28 - 340 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+          </div>
+     
+          <!-- 2. ŞARKÜTERİ VE PROTEİN (Çoklu Seçim) -->
+          <div class="category-group">
+            <div class="category-header">🍗 Şarküteri & Protein</div>
+     
+            <div class="ingredient-row selected" data-price="35" data-kcal="95" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🍗</div>
+                <div class="item-details">
+                  <span class="item-name">Füme Hindi</span>
+                  <span class="item-meta">+₺35 - 95 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">✓</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="45" data-kcal="145" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🥓</div>
+                <div class="item-details">
+                  <span class="item-name">Dana Rozbif</span>
+                  <span class="item-meta">+₺45 - 145 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="40" data-kcal="130" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🐟</div>
+                <div class="item-details">
+                  <span class="item-name">Ton Balığı</span>
+                  <span class="item-meta">+₺40 - 130 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+          </div>
+     
+          <!-- 3. PEYNİR ÇEŞİTLERİ (Çoklu Seçim) -->
+          <div class="category-group">
+            <div class="category-header">🧀 Peynir Çeşitleri</div>
+     
+            <div class="ingredient-row selected" data-price="30" data-kcal="140" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🧀</div>
+                <div class="item-details">
+                  <span class="item-name">Mozzarella</span>
+                  <span class="item-meta">+₺30 - 140 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">✓</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="35" data-kcal="170" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🧀</div>
+                <div class="item-details">
+                  <span class="item-name">Cheddar Peyniri</span>
+                  <span class="item-meta">+₺35 - 170 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="25" data-kcal="90" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🧀</div>
+                <div class="item-details">
+                  <span class="item-name">Labne / Süzme Peynir</span>
+                  <span class="item-meta">+₺25 - 90 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+          </div>
+     
+          <!-- 4. SOSLAR VE YEŞİLLİKLER (Çoklu Seçim) -->
+          <div class="category-group">
+            <div class="category-header">🥗 Soslar & Yeşillikler</div>
+     
+            <div class="ingredient-row" data-price="12" data-kcal="80" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🌿</div>
+                <div class="item-details">
+                  <span class="item-name">Pesto Sos</span>
+                  <span class="item-meta">+₺12 - 80 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="10" data-kcal="60" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🟡</div>
+                <div class="item-details">
+                  <span class="item-name">Ballı Hardal</span>
+                  <span class="item-meta">+₺10 - 60 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="8" data-kcal="6" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🌱</div>
+                <div class="item-details">
+                  <span class="item-name">Roka</span>
+                  <span class="item-meta">+₺8 - 6 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="10" data-kcal="12" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🥒</div>
+                <div class="item-details">
+                  <span class="item-name">Kornişon Turşu</span>
+                  <span class="item-meta">+₺10 - 12 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+     
+            <div class="ingredient-row" data-price="15" data-kcal="80" onclick="toggleItem(this)">
+              <div class="item-left">
+                <div class="item-icon">🥑</div>
+                <div class="item-details">
+                  <span class="item-name">Avokado Dilimleri</span>
+                  <span class="item-meta">+₺15 - 80 kcal</span>
+                </div>
+              </div>
+              <div class="item-status-icon">+</div>
+            </div>
+          </div>
+     
+        </div>
+     
+      </main>
+     
+    </div>
+
+    <!-- YÜZEN SEPETE EKLE BUTONU (Sabit) -->
+    <div class="add-to-cart-bar">
+      <button class="add-to-cart-btn" id="addToCartBtn">
+        <span>🛒 Sepete Ekle</span>
+        <span class="cart-info" id="btnCartDetails">₺0,00 (0 kcal)</span>
+      </button>
+    </div>
+     
+    <!-- BİLDİRİM KARTI / TOAST NOTIFICATION -->
+    <div class="toast-notification" id="toastCard">
+      <div class="toast-header">
+        <div class="toast-icon" id="toastIcon">✓</div>
+        <div class="toast-title-group">
+          <span class="toast-title" id="toastTitle">Sepete Eklendi!</span>
+          <span class="toast-subtitle" id="toastItemName">"Özel Sandviçim" sepete atıldı.</span>
+        </div>
+      </div>
+      <div class="toast-actions">
+        <button class="toast-btn-secondary" id="toastCloseBtn">Tamam</button>
+        <button class="toast-btn-primary" id="toastMainBtn">Sepete Git ➔</button>
+      </div>
+    </div>
+
+  </div>
+ 
+  <script>
+    const nameInput = document.getElementById('recipeName');
+    const badgeTitle = document.getElementById('badgeTitle');
+    const toastCard = document.getElementById('toastCard');
+    const toastTitle = document.getElementById('toastTitle');
+    const toastItemName = document.getElementById('toastItemName');
+    const toastIcon = document.getElementById('toastIcon');
+    const favoritesGrid = document.getElementById('favoritesGrid');
+    const sidebarDrawer = document.getElementById('sidebarDrawer');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const toastCloseBtn = document.getElementById('toastCloseBtn');
+    const toastMainBtn = document.getElementById('toastMainBtn');
+    let toastTimeout = null;
+ 
+    function toggleSidebar(){
+      sidebarDrawer.classList.toggle('open');
+      sidebarOverlay.classList.toggle('active');
+    }
+ 
+    function closeSidebar(){
+      sidebarDrawer.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    }
+ 
+    if (menuBtn) menuBtn.addEventListener('click', toggleSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeSidebar);
+ 
+    nameInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      badgeTitle.textContent = val !== '' ? e.target.value : 'Özel Sandviçim';
+    });
+ 
+    function clearInput(){
+      nameInput.value = '';
+      badgeTitle.textContent = 'Özel Sandviçim';
+    }
+ 
+    function toggleItem(row){
+      row.classList.toggle('selected');
+      const statusIcon = row.querySelector('.item-status-icon');
+      statusIcon.textContent = row.classList.contains('selected') ? '✓' : '+';
+      calculateTotals();
+    }
+ 
+    function selectRadio(row){
+      const parentCategory = row.closest('.category-group');
+      parentCategory.querySelectorAll('.ingredient-row').forEach(r => {
+        r.classList.remove('selected');
+        r.querySelector('.item-status-icon').textContent = '+';
+      });
+ 
+      row.classList.add('selected');
+      row.querySelector('.item-status-icon').textContent = '✓';
+      calculateTotals();
+    }
+ 
+    function getCurrentRecipeData(){
+      const selectedRows = document.querySelectorAll('.ingredient-row.selected');
+      let price = 0;
+      let kcal = 0;
+      let items = [];
+ 
+      selectedRows.forEach(row => {
+        price += parseFloat(row.getAttribute('data-price')) || 0;
+        kcal += parseInt(row.getAttribute('data-kcal')) || 0;
+        items.push(row.querySelector('.item-name').textContent.trim());
+      });
+ 
+      const name = nameInput.value.trim() !== '' ? nameInput.value.trim() : 'Özel Sandviçim';
+      return { name, price, kcal, items };
+    }
+ 
+    function calculateTotals(){
+      const data = getCurrentRecipeData();
+      const btnDetails = document.getElementById('btnCartDetails');
+      if (btnDetails) {
+        btnDetails.textContent = `₺${data.price.toFixed(2)} (${data.kcal} kcal)`;
+      }
+    }
+ 
+    function addToCart(){
+      const data = getCurrentRecipeData();
+      try {
+        let cart = JSON.parse(localStorage.getItem('artisanCart') || '[]');
+        cart.push({
+          id: Date.now(),
+          name: data.name,
+          price: data.price,
+          kcal: data.kcal,
+          desc: data.items.join(', '),
+          quantity: 1,
+          type: 'custom'
+        });
+        localStorage.setItem('artisanCart', JSON.stringify(cart));
+        showToast("Sepete Eklendi!", `"${data.name}" sepete atıldı.`, "✓", goToCart);
+      } catch (e) {
+        console.error("Sepete ekleme hatası:", e);
+      }
+    }
+ 
+    function saveToFavorites(){
+      const data = getCurrentRecipeData();
+      try {
+        let favs = JSON.parse(localStorage.getItem('artisanSandwichFavs') || '[]');
+        favs.push({
+          id: Date.now(),
+          name: data.name,
+          price: data.price,
+          kcal: data.kcal,
+          desc: data.items.join(', ')
+        });
+        localStorage.setItem('artisanSandwichFavs', JSON.stringify(favs));
+        loadFavorites();
+        showToast("Favorilere Eklendi!", `"${data.name}" favorilerinize kaydedildi.`, "⭐", () => { window.location.href = 'favoriler.html'; });
+      } catch (e) {
+        console.error("Favorilere ekleme hatası:", e);
+      }
+    }
+
+    function showToast(title, subtitle, iconText, primaryAction){
+      toastTitle.textContent = title;
+      toastItemName.textContent = subtitle;
+      toastIcon.textContent = iconText;
+      
+      if(iconText === "⭐") {
+        toastMainBtn.textContent = "Favorilere Git ➔";
+        toastMainBtn.onclick = primaryAction;
+      } else {
+        toastMainBtn.textContent = "Sepete Git ➔";
+        toastMainBtn.onclick = goToCart;
+      }
+
+      toastCard.classList.add('show');
+      if(toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        closeToast();
+      }, 4000);
+    }
+
+    function closeToast(){
+      toastCard.classList.remove('show');
+    }
+
+    function goToCart(){
+      window.location.href = 'sepetim.html';
+    }
+ 
+    function loadFavorites(){
+      if (!favoritesGrid) return;
+      let favs = JSON.parse(localStorage.getItem('artisanSandwichFavs') || '[]');
+      if (favs.length === 0) {
+        favoritesGrid.innerHTML = `<span class="empty-fav-msg">Henüz kaydedilmiş favori yok.</span>`;
+        return;
+      }
+      
+      favoritesGrid.innerHTML = '';
+      favs.forEach(fav => {
+        const card = document.createElement('div');
+        card.className = 'fav-card';
+        card.innerHTML = `
+          <button class="fav-delete-btn" onclick="deleteFav(${fav.id})">✕</button>
+          <div>
+            <div class="fav-card-title">${fav.name}</div>
+            <div class="fav-card-desc">${fav.desc}</div>
+          </div>
+          <div class="fav-card-footer">
+            <span class="fav-card-price">₺${fav.price.toFixed(2)}</span>
+            <div class="fav-btn-group">
+              <button class="fav-load-btn" onclick="loadFav(${fav.id})">Yükle</button>
+              <button class="fav-add-btn" onclick="addFavToCart(${fav.id})">Ekle</button>
+            </div>
+          </div>
+        `;
+        favoritesGrid.appendChild(card);
+      });
+    }
+
+    function deleteFav(id){
+      let favs = JSON.parse(localStorage.getItem('artisanSandwichFavs') || '[]');
+      favs = favs.filter(f => f.id !== id);
+      localStorage.setItem('artisanSandwichFavs', JSON.stringify(favs));
+      loadFavorites();
+    }
+
+    function loadFav(id){
+      let favs = JSON.parse(localStorage.getItem('artisanSandwichFavs') || '[]');
+      let fav = favs.find(f => f.id === id);
+      if(fav){
+        nameInput.value = fav.name;
+        badgeTitle.textContent = fav.name;
+      }
+    }
+
+    function addFavToCart(id){
+      let favs = JSON.parse(localStorage.getItem('artisanSandwichFavs') || '[]');
+      let fav = favs.find(f => f.id === id);
+      if(fav){
+        let cart = JSON.parse(localStorage.getItem('artisanCart') || '[]');
+        cart.push({
+          id: Date.now(),
+          name: fav.name,
+          price: fav.price,
+          kcal: fav.kcal,
+          desc: fav.desc,
+          quantity: 1,
+          type: 'custom'
+        });
+        localStorage.setItem('artisanCart', JSON.stringify(cart));
+        showToast("Sepete Eklendi!", `"${fav.name}" sepete atıldı.`, "✓", goToCart);
+      }
+    }
+
+    if(addToCartBtn) {
+      addToCartBtn.addEventListener('click', addToCart);
+      addToCartBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        addToCart();
+      });
+    }
+
+    if(toastCloseBtn) {
+      toastCloseBtn.addEventListener('click', closeToast);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      calculateTotals();
+      loadFavorites();
+    });
+  </script>
+</body>
+</html>
